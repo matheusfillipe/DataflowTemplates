@@ -167,7 +167,6 @@ public class BulkCompressor {
         description = "Output filename suffix",
         helpText =
             "Output filename suffix of the files to write. Defaults to .bzip2, .deflate or .gz depending on the compression algorithm.")
-    @Default.String(null)
     ValueProvider<String> getOutputFilenameSuffix();
 
     void setOutputFilenameSuffix(ValueProvider<String> outputFilenameSuffix);
@@ -251,14 +250,18 @@ public class BulkCompressor {
     public void processElement(ProcessContext context) {
       ResourceId inputFile = context.element().resourceId();
       Compression compression = compressionValue.get();
+      Options options = context.getPipelineOptions().as(Options.class);
+      String outputFilename;
 
       // Add the extension to the output filename.
-      if (options.getOutputFilenameSuffix() != null) {
+      if (options.getOutputFilenameSuffix() != null
+          && options.getOutputFilenameSuffix().isAccessible()
+          && options.getOutputFilenameSuffix().get() != null) {
         // Use suffix parameter. Example: demo.txt -> demo.txt.foo
-        String outputFilename = inputFile.getFilename() + options.getOutputFilenameSuffix();
+        outputFilename = inputFile.getFilename() + options.getOutputFilenameSuffix().get();
       } else {
         // Use compression extension. Example: demo.txt -> demo.txt.gz
-        String outputFilename = inputFile.getFilename() + compression.getSuggestedSuffix();
+        outputFilename = inputFile.getFilename() + compression.getSuggestedSuffix();
       }
 
       // Resolve the necessary resources to perform the transfer
