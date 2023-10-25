@@ -165,7 +165,8 @@ public class BulkCompressor {
         optional = true,
         regexes = {"^[A-Za-z_0-9.]*"},
         description = "Output filename suffix",
-        helpText = "Output filename suffix of the files to write. Defaults to .bzip2, .deflate or .gz depending on the compression algorithm.")
+        helpText =
+            "Output filename suffix of the files to write. Defaults to .bzip2, .deflate or .gz depending on the compression algorithm.")
     @Default.String(null)
     ValueProvider<String> getOutputFilenameSuffix();
 
@@ -251,11 +252,12 @@ public class BulkCompressor {
       ResourceId inputFile = context.element().resourceId();
       Compression compression = compressionValue.get();
 
+      // Add the extension to the output filename.
       if (options.getOutputFilenameSuffix() != null) {
-        // Add the extension provided as a parameter to the output filename. Example: demo.txt -> demo.txt.foobar
+        // Use suffix parameter. Example: demo.txt -> demo.txt.foo
         String outputFilename = inputFile.getFilename() + options.getOutputFilenameSuffix();
       } else {
-        // Add the compression extension to the output filename. Example: demo.txt -> demo.txt.gz
+        // Use compression extension. Example: demo.txt -> demo.txt.gz
         String outputFilename = inputFile.getFilename() + compression.getSuggestedSuffix();
       }
 
