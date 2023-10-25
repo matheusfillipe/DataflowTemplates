@@ -34,6 +34,7 @@ import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.io.fs.MatchResult;
 import org.apache.beam.sdk.io.fs.ResolveOptions.StandardResolveOptions;
 import org.apache.beam.sdk.io.fs.ResourceId;
+import org.apache.beam.sdk.options.Default;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.options.Validation.Required;
@@ -167,7 +168,7 @@ public class BulkCompressor {
         description = "Output filename suffix",
         helpText =
             "Output filename suffix of the files to write. Defaults to .bzip2, .deflate or .gz depending on the compression algorithm.")
-    @Default.String(null)
+    @Default.String("")
     ValueProvider<String> getOutputFilenameSuffix();
 
     void setOutputFilenameSuffix(ValueProvider<String> outputFilenameSuffix);
@@ -251,14 +252,17 @@ public class BulkCompressor {
     public void processElement(ProcessContext context) {
       ResourceId inputFile = context.element().resourceId();
       Compression compression = compressionValue.get();
+      Options options = context.getPipelineOptions().as(Options.class);
+      String outputSuffix = options.getOutputFilenameSuffix().get();
+      String outputFilename;
 
       // Add the extension to the output filename.
-      if (options.getOutputFilenameSuffix() != null) {
+      if (outputSuffix.isEmpty()) {
         // Use suffix parameter. Example: demo.txt -> demo.txt.foo
-        String outputFilename = inputFile.getFilename() + options.getOutputFilenameSuffix();
+        outputFilename = inputFile.getFilename() + outputSuffix;
       } else {
         // Use compression extension. Example: demo.txt -> demo.txt.gz
-        String outputFilename = inputFile.getFilename() + compression.getSuggestedSuffix();
+        outputFilename = inputFile.getFilename() + compression.getSuggestedSuffix();
       }
 
       // Resolve the necessary resources to perform the transfer
