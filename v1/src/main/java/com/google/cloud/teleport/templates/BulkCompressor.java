@@ -169,7 +169,7 @@ public class BulkCompressor {
             "Output filename suffix of the files to write. Defaults to .bzip2, .deflate or .gz depending on the compression algorithm.")
     ValueProvider<String> getOutputFilenameSuffix();
 
-    void setOutputFilenameSuffix(ValueProvider<String> outputFilenameSuffix);
+    void setOutputFilenameSuffix(ValueProvider<String> value);
   }
 
   /**
